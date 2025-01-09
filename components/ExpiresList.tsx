@@ -17,6 +17,7 @@ interface ExpiresListProps {
 
 
 const renderExpire = (item: Expire, expireItemClickListener: (id: number) => void) => {
+
     return (
         <Pressable style={{flex: 1}} onPress={() => {
             expireItemClickListener(item.id)
@@ -28,6 +29,8 @@ const renderExpire = (item: Expire, expireItemClickListener: (id: number) => voi
 }
 
 export default function ExpiresList({expires, expireItemClickListener}: ExpiresListProps) {
+
+
     return (
         <View>
             <FlatList

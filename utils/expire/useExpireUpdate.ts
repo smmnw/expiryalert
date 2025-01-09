@@ -1,6 +1,7 @@
 import * as SQLite from "expo-sqlite";
 import {useMutation} from "@tanstack/react-query";
 import {useSqlite} from "../SQLiteProvider";
+import {formatDateToISO} from '../OtherUtils'
 
 interface SQLiteContextType {
     db?: SQLite.SQLiteDatabase
@@ -14,7 +15,8 @@ interface Expire {
 }
 
 const expireUpdate = async (db: SQLiteContextType, {id,name,date,category}: Expire) => {
-    const result = await  db.db?.runAsync(`UPDATE records SET date =? ,name=?,category=? WHERE id=?`,[date.getTime(),name,category,id])
+    const updatedDate =formatDateToISO(date)
+    const result = await  db.db?.runAsync(`UPDATE records SET date =? ,name=?,category=? WHERE id=?`,[updatedDate,name,category,id])
     return result
 }
 
@@ -26,3 +28,4 @@ export function useExpireUpdate() {
         mutationKey: ['expire']
     })
 }
+

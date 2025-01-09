@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState} from "react";
 import *as SQLite from 'expo-sqlite'
-import {View,Text} from "react-native";
 import LoadingIndicator from "../components/LoadingIndicator";
 
 interface SQLiteContextType{
@@ -17,14 +16,14 @@ interface SQLiteProviderProps {
 
 export default function SQLiteProvider({children}: SQLiteProviderProps) {
 
-    const [db, setDB] = useState<SQLite.SQLiteDatabase>()
+    const [database, setDatabase] = useState<SQLite.SQLiteDatabase>()
      const [loading,setLoading] =useState<boolean>(true)
 
     useEffect(() => {
-        const initializeDB = async () => {
+        const initializeDatabase = async () => {
 
             const dbInstance = await SQLite.openDatabaseAsync('expires.db')
-            setDB(dbInstance)
+            setDatabase(dbInstance)
 
             await dbInstance.execAsync(`
             PRAGMA journal_mode =WAL;
@@ -38,7 +37,7 @@ export default function SQLiteProvider({children}: SQLiteProviderProps) {
             setLoading(false)
         }
 
-        initializeDB()
+        initializeDatabase()
     }, [])
 
 
@@ -46,8 +45,9 @@ export default function SQLiteProvider({children}: SQLiteProviderProps) {
     if(loading){
         return  <LoadingIndicator/>
     }
+
     return (
-        <SQLiteContext.Provider value={{db}}>
+        <SQLiteContext.Provider value={{db: database}}>
             {children}
         </SQLiteContext.Provider>
     )

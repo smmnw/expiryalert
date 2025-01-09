@@ -10,16 +10,34 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#eceff1"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.smmnw.expiryalert",
+      "name": "Expiry Alert Plus",
+      "buildNumber": "1",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"],
+        "NSUserNotificationUsageDescription": "This app needs notification access to send you alerts and updates.",
+        "NSLocationAlwaysUsageDescription": "We use this permission to send location-based notifications."
+
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.smmnw.expiryalert",
+      "versionCode": 1,
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "WAKE_LOCK",
+        "VIBRATE",
+        "ACCESS_NOTIFICATION_POLICY"
+      ],
+      "useNextNotificationsApi": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,10 +53,18 @@
             "useSQLCipher": false
           },
           "ios": {
-            "customBuildFlags": ["-DSQLITE_ENABLE_DBSTAT_VTAB=1", "-DSQLITE_ENABLE_SNAPSHOT=1"]
+            "customBuildFlags": [
+              "-DSQLITE_ENABLE_DBSTAT_VTAB=1",
+              "-DSQLITE_ENABLE_SNAPSHOT=1"
+            ]
           }
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3574a094-1aff-4b46-8503-87db2658aae0"
+      }
+    }
   }
 }

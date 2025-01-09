@@ -1,4 +1,4 @@
-import {View} from "react-native";
+import {View,AppState} from "react-native";
 import {FAB, SegmentedButtons} from 'react-native-paper'
 import ExpiresList from "../components/ExpiresList";
 import {useIsFocused, useNavigation} from "@react-navigation/native";
@@ -7,7 +7,10 @@ import {useEffect, useState} from "react";
 import useExpireFilterFetch from "../utils/expire/useExpireFilterFetch";
 import ItemNotFound from "../components/ItemNotFound";
 import LoadingIndicator from "../components/LoadingIndicator";
-
+import {StatusBar} from "expo-status-bar";
+import {requestNotification,registerNotification} from '../utils/features/notification/useNotificationHandler'
+import {registerBackgroundCheckNotification} from '../utils/features/notification/BackgroundTask'
+import {fetchCounterData, saveCounterValue} from "../utils/StorageUtils";
 
 interface Expire {
     id: number,
@@ -25,13 +28,41 @@ export default function ExpireScreen() {
     const isFocused = useIsFocused()
 
 
+
+    useEffect(() => {
+      const listener=  AppState.addEventListener('change',nextState =>{
+          if(nextState==='background'){
+              registerBackgroundCheckNotification()
+          }
+        })
+        return ()=> {
+            listener.remove()
+        }
+    }, [AppState]);
+
+    useEffect(() => {
+        const initializeCounter = async () => {
+            const data = await fetchCounterData()
+            if (!data) {
+                      await saveCounterValue('3')
+            }
+        }
+        initializeCounter()
+    }, []);
+
+    useEffect(() =>{
+           registerNotification()
+         requestNotification()
+
+    }, []);
+
+
     useEffect(() => {
         if(filter==='expired'){
             filterFun()
         }else{
             refetch()
         }
-
     }, [isFocused,filter]);
 
 
@@ -45,7 +76,7 @@ export default function ExpireScreen() {
 
         const updatedData = newData ? newData.map((item: any) => ({
             id: item.id,
-            date: new Date(parseInt(item.date)),
+            date: new Date(item.date),
             name: item.name,
             category: item.category,
         })) : [];
@@ -61,13 +92,7 @@ export default function ExpireScreen() {
         })
     }, [data, expiredData, filter])
 
-
-    if (isLoading) {
-        return <LoadingIndicator/>
-    }
-
-
-    const segmentedButtonHandler = (type: string):void => {
+    const handleSegmentButtonClick = (type: string):void => {
         setFilter(type)
         switch (type) {
             case 'ascending':
@@ -91,38 +116,49 @@ export default function ExpireScreen() {
 
     }
 
-    const expireItemClickListener = (id: number):void => {
+    const handleExpireItemClick = (id: number):void => {
         //@ts-ignore
        navigation.navigate('ExpireAddScreen',{itemID:id})
     }
 
+
+    if (isLoading) {
+        return <LoadingIndicator/>
+    }
+
+
     return (
         <View style={{flex: 1}}>
+            <StatusBar style='light'/>
             <SegmentedButtons
                 value={filter}
-                onValueChange={segmentedButtonHandler}
-                buttons={[
-
+                onValueChange={handleSegmentButtonClick}
+                buttons={
+                    [
                     {
                         value: 'ascending',
                         label: 'Ascending',
+                        icon: 'arrow-down-drop-circle-outline',
                     },
                     {
                         value: 'descending',
-                        label: 'Descending'
+                        label: 'Descending',
+                        icon: 'arrow-up-drop-circle-outline'
                     },
                     {
                         value: 'expired',
-                        label: 'Expired'
+                        label: 'Expired',
+                        icon: 'alert-circle-outline'
                     },
                 ]}
+
                 style={{
-                    margin: 8
+                    margin: 8,
                 }}
             />
 
 
-            {expiresData.length === 0 ? <ItemNotFound/> : <ExpiresList expires={expiresData} expireItemClickListener={expireItemClickListener}/>}
+            {expiresData.length === 0 ? <ItemNotFound/> : <ExpiresList expires={expiresData} expireItemClickListener={handleExpireItemClick}/>}
             <FAB
                 icon="plus"
                 style={{

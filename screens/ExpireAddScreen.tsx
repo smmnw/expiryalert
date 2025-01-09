@@ -3,11 +3,12 @@ import {View} from "react-native";
 import {useEffect, useState} from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {useExpireAdd} from "../utils/expire/useExpireAdd";
-import {RouteProp, useNavigation} from "@react-navigation/native";
+import {RouteProp} from "@react-navigation/native";
 import {StackNavigationProp} from "@react-navigation/stack";
 import useExpireDelete from "../utils/expire/useExpireDelete";
 import {useExpireFetch} from "../utils/expire/useExpireFetch";
 import {useExpireUpdate} from "../utils/expire/useExpireUpdate";
+import {StatusBar} from "expo-status-bar";
 
 type RootStackParamList = {
     ExpireScreen: undefined,
@@ -34,13 +35,17 @@ export default function ExpireAddScreen({route,navigation}: ExpireAddScreenProps
 
 
     useEffect(() => {
+        navigation.setOptions({title: itemID ? 'Update Expire' : 'Add Expire'})
+    }, [navigation]);
+
+    useEffect(() => {
         if(itemID){
            // @ts-ignore
             fetchExpire({id:itemID},{onSuccess:(data)=>{
                 //@ts-ignore
                 setName(data.name)
                 //@ts-ignore
-                    setDate(new Date(parseInt(data.date)))
+                    setDate(new Date(data.date))
                 }})
         }
     }, [itemID]);
@@ -77,19 +82,21 @@ export default function ExpireAddScreen({route,navigation}: ExpireAddScreenProps
 
     return (
         <View style={{flex: 1, margin: 8}}>
-            <TextInput value={name} onChangeText={setName} label='Name of item'/>
-            <Text style={{textAlign: 'center'}}>{`Expire Date : ${date.toLocaleDateString()}`}</Text>
-            {isShow && <DateTimePicker
+            <StatusBar style='light'/>
+            <TextInput value={name} onChangeText={setName} label='Name' mode='outlined' style={{marginVertical: 4}}/>
+            <Text variant='bodyLarge'
+                  style={{margin: 8, fontWeight: 'bold'}}>{`Expire Date : ${date.toLocaleDateString()}`}</Text>
+            {isShow && <View style={{alignItems: 'center', margin: 8}}><DateTimePicker
                 value={date}
                 onChange={(event, selectedDate) => {
                     // @ts-ignore
                     setDate(selectedDate)
                     setIsShow(false)
                 }}
-            />}
+            /></View>}
             <Button onPress={() => {
                 setIsShow(prevState => !prevState)
-            }} mode='outlined'>Choose Date</Button>
+            }} mode='contained-tonal' textColor='#ffffff'>Choose Date</Button>
 
             <View style={{flexDirection: 'row', justifyContent: 'center', margin: 10}}>
                 <Button onPress={() => {
@@ -105,7 +112,7 @@ export default function ExpireAddScreen({route,navigation}: ExpireAddScreenProps
                         handleAdd()
                     }
 
-                }}>{itemID ? 'Update' : 'Save'}</Button>
+                }} disabled={!name}>{itemID ? 'Update' : 'Save'}</Button>
             </View>
         </View>
     )

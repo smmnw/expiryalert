@@ -1,7 +1,6 @@
-import {Card, Text} from "react-native-paper";
+import {Card, Text, useTheme} from "react-native-paper";
 import {View} from "react-native";
-import DateToDaysLeft from "../utils/DateToDaysLeft";
-import DaysLeftToColor from "../utils/DaysLeftToColor";
+import {dateToDaysLeft,daysLeftToColor} from "../utils/OtherUtils";
 
 interface Expire {
     id: number,
@@ -16,11 +15,13 @@ interface ExpireItemProps {
 
 
 export default function ExpireItem({expire}: ExpireItemProps) {
-    return (
-        <View style={{flex: 1, margin: 2}}>
-            <Card mode='outlined' >
+    const {colors} =useTheme()
 
-                <Card.Title title={expire.name}/>
+    return (
+        <View style={{flex: 1, margin: 2,backgroundColor:colors.background}}>
+            <Card mode='elevated'  style={{backgroundColor:colors.surface}}>
+
+                <Card.Title title={expire.name} />
 
 
                 <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -30,12 +31,12 @@ export default function ExpireItem({expire}: ExpireItemProps) {
                             width: 50,
                             height: 50,
                             borderRadius: 25,
-                            backgroundColor: DaysLeftToColor(DateToDaysLeft(expire.date)),
+                            backgroundColor: daysLeftToColor(dateToDaysLeft(expire.date)),
                             justifyContent: 'center',
                             alignItems: 'center'
                         }}>
                         <Text style={{textAlign: 'center', color: 'white', fontSize: 14}}>
-                            {DateToDaysLeft(expire.date)}
+                            {dateToDaysLeft(expire.date)}
                         </Text>
                     </View>
 
